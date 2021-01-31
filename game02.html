@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<title>Memory Game</title>
+<script
+src="https://code.jquery.com/jquery-2.2.4.min.js"
+integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+crossorigin="anonymous"></script>
+<style type="text/css">
+/* reset */
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,textarea,p,blockquote,th,td,input,select,textarea,button {margin:0;padding:0}
+fieldset,img {border:0 none}
+dl,ul,ol,menu,li {list-style:none}
+blockquote, q {quotes: none}
+blockquote:before, blockquote:after,q:before, q:after {content:'';content:none}
+input,select,textarea,button {vertical-align:middle}
+button {border:0 none;background-color:transparent;cursor:pointer}
+table {border-collapse:collapse;border-spacing:0}
+body {background:#fff}
+body,th,td,input,select,textarea,button {font-size:12px;line-height:1.5;font-family:"Open Sans",'돋움',dotum,sans-serif;color:#333}
+a {color:#333;text-decoration:none}
+a:active, a:hover {text-decoration:underline}
+address,caption,cite,code,dfn,em,var {font-style:normal;font-weight:normal}
+
+.hide {position:absolute;overflow:hidden;clip:rect(0 0 0 0);margin:-1px;width:1px;height:1px;}
+body {background:#060AB2;}
+html, body {height:100%;}
+.wrap {display:flex;height:100%;}
+.memory-box {display:flex;flex-wrap:wrap;width:400px;height:400px;margin:auto;}
+.memory-box .card {position:relative;width: calc(25% - 10px);height: calc(33.3333% - 10px);margin:5px;transform:scale(1);transition:transform 0.5s;box-shadow: 1px 1px 1px rgba(0,0,0,0.3);transform-style:preserve-3d;box-sizing:border-box;}
+.memory-box .card:active {transform:scale(0.97);transition:transform 0.2s;}
+.memory-box .card.flip {transform:rotateY(180deg);}
+.memory-box .front,
+.memory-box .back {position:absolute;width:100%;height:100%;padding:10px;border-radius:5px;background:#1c7ccc;backface-visibility:hidden;box-sizing:border-box;}
+.memory-box .front {transform:rotateY(180deg);}
+.memory-box .back {cursor:pointer;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+    <section class="memory-box" id="memoryCard"></section>
+
+</div>
+
+<script>
+(function(window, document, undefined){
+    'use strict';
+
+    let hasFlippedCard = false;
+    let lockBoard = false;
+    let firstCard = null;
+    let secondCard = null;
+    const cardsArray = ['react', 'angular', 'ember', 'vue', 'backbone', 'aurelia'];
+    let cardsSet = [];
+    const grid = document.querySelector('#memoryCard');
+    const fragment = document.createDocumentFragment();
+    let cards = null;
+    let flipped = 0;
+
+    function flipCard() {
+        const currentCard = this;
+    
+        if(lockBoard) return;
+        if(currentCard === firstCard) return;
+        
+        currentCard.className += ' flip';
+
+        if(!hasFlippedCard) {
+            hasFlippedCard = true;
+            firstCard = currentCard;
+            return;
+        }
+
+        secondCard = currentCard;
+
+        checkForMatch();
+    }
+
+    function checkForMatch() {
+        let isMatch = firstCard.dataset.name === secondCard.dataset.name;
+        isMatch ? disableCards() : unflipCards();
+    }
+
+    function disableCards() {
+        flipped++;
+        firstCard.removeEventListener('click', flipCard);
+        secondCard.removeEventListener('click', flipCard);
+        if(flipped === cardsArray.length) {
+            setTimeout(() => {
+                alert('Completed');
+            }, 500);
+        }
+        resetBoard();
+    }
+
+    function unflipCards() {
+        lockBoard = true;
+
+        setTimeout(() => {
+            firstCard.className = firstCard.className.replace(' flip', '');
+            secondCard.className = secondCard.className.replace(' flip', '');
+
+            resetBoard();
+        }, 1500);
+    }
+
+    function resetBoard() {
+        [firstCard, secondCard] = [null, null];
+        [hasFlippedCard, lockBoard] = [false, false];
+    }
+
+    cardsSet = cardsArray.concat(cardsArray).sort(function() {
+        return 0.5 - Math.random();
+    });
+
+    cardsSet.forEach(c => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.dataset.name = c;
+        const front = document.createElement('img');
+        front.className = 'front';
+        front.src = `img/${c}.svg`;
+        const back = document.createElement('img');
+        back.src = `img/js-badge.svg`;
+        back.className = 'back';
+        card.appendChild(front);
+        card.appendChild(back);
+        fragment.appendChild(card);
+    });
+    grid.appendChild(fragment);
+    cards = document.querySelectorAll('.card');
+    cards.forEach(card => card.addEventListener('click', flipCard));
+
+})(window, document);
+
+// REF.
+// https://medium.freecodecamp.org/vanilla-javascript-tutorial-build-a-memory-game-in-30-minutes-e542c4447eae
+// https://www.taniarascia.com/how-to-create-a-memory-game-super-mario-with-plain-javascript/
+// https://scotch.io/tutorials/how-to-build-a-memory-matching-game-in-javascript
+// http://www.memozor.com/memory-game-online-free/for-kids/kids-4-years-old-games/online-memory-game-for-kids-walt-disney
+
+</script>
+</body>
+</html>

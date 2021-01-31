@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<title>Rock Paper Scissors</title>
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+<script
+src="https://code.jquery.com/jquery-2.2.4.min.js"
+integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+crossorigin="anonymous"></script>
+<style type="text/css">
+/* reset */
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,textarea,p,blockquote,th,td,input,select,textarea,button {margin:0;padding:0}
+fieldset,img {border:0 none}
+dl,ul,ol,menu,li {list-style:none}
+blockquote, q {quotes: none}
+blockquote:before, blockquote:after,q:before, q:after {content:'';content:none}
+input,select,textarea,button {vertical-align:middle}
+button {border:0 none;background-color:transparent;cursor:pointer}
+table {border-collapse:collapse;border-spacing:0}
+body {background:#fff}
+body,th,td,input,select,textarea,button {font-size:12px;line-height:1.5;font-family:"Open Sans",'돋움',dotum,sans-serif;color:#333}
+a {color:#333;text-decoration:none}
+a:active, a:hover {text-decoration:underline}
+address,caption,cite,code,dfn,em,var {font-style:normal;font-weight:normal}
+
+.hide {position:absolute;overflow:hidden;clip:rect(0 0 0 0);margin:-1px;width:1px;height:1px;}
+.wrap {padding-top:50px;}
+h3 {margin-bottom:20px;font-size:20px;text-align:center;}
+.choice {margin-bottom:50px;text-align:center;}
+.choice a,
+.choice span {display:inline-block;margin:0 20px;font-size:100px;text-decoration:none;}
+.choice i {position:absolute;overflow:hidden;clip:rect(0 0 0 0);margin:-1px;width:1px;height:1px;}
+.result-box {height:100px;font-weight:bold;color:red;font-size:50px;text-align:center;}
+.result-box button {margin-left:10px;color:red;font-size:50px;vertical-align:-1px;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+    <div class="user-box" id="userChoice">
+        <h3>Do you choose rock, paper or scissors?</h3>
+        <div class="choice">
+            <a href="#" class="fas fa-hand-rock"><i>rock</i></a>
+            <a href="#" class="fas fa-hand-paper"><i>paper</i></a>
+            <a href="#" class="fas fa-hand-scissors"><i>scissors</i></a>
+        </div>
+    </div>
+    <div class="result-box" id="resultNote"></div>
+    <div class="computer-box" id="computerChoice">
+        <h3>Computer chooses</h3>
+        <div class="choice">
+            <span class="fas fa-hand-rock"><i>rock</i></span>
+            <span class="fas fa-hand-paper"><i>paper</i></span>
+            <span class="fas fa-hand-scissors"><i>scissors</i></span>
+        </div>
+    </div>
+</div>
+
+<script>
+(function(window, document, undefined){
+    'use strict';
+
+    const userChoice = document.querySelector('#userChoice');
+    const computerChoice = document.querySelector('#computerChoice');
+    const resultNote = document.querySelector('#resultNote');
+    const userAnchors = userChoice.querySelectorAll('a');
+    const computerSpans = computerChoice.querySelectorAll('span');
+    const choiceList = ['rock', 'paper', 'scissors'];
+
+    function getRndInteger(min, max) {
+        return Math.floor(Math.random() * (max - min + 1) ) + min;
+    }
+
+    function compareChoice(user, computer) {
+        let message = '';
+        if(user === computer) {
+            message =  "a tie!";
+        }
+        else if(user === 0) {
+            if(computer === 1) {
+                message =  "lose!";
+            }
+            else if(computer === 2) {
+                message =  "win!";
+            }
+        }
+        else if(user === 1) {
+            if(computer === 0) {
+                message =  "win!";
+            }
+            else if(computer === 2) {
+                message =  "lose!";
+            }
+        }
+        else if(user === 2) {
+            if(computer === 0) {
+                message =  "lose!";
+            }
+            else if(computer === 1) {
+                message =  "win!";
+            }
+        }
+        return message;
+    }
+
+    function resetGame() {
+        resultNote.innerHTML = '';
+        userChoice.addEventListener('click', bindEvent, false);
+        Array.from(userAnchors).forEach( c => {
+            c.className = c.className.replace('far', 'fas');
+            c.style.cursor = 'pointer';
+        });
+        Array.from(computerSpans).forEach( c => {
+            c.className = c.className.replace('far', 'fas');
+        });    
+    }
+
+    function bindEvent(e) {
+        const box = e.target.parentElement;
+        const styleName = e.target.className;
+        const userResult = Array.prototype.indexOf.call(userAnchors, e.target);
+        const computerResult = getRndInteger(0, 2);
+        const restart = document.createElement('button');
+        
+        e.preventDefault();
+        e.target.className = e.target.className.replace('fas', 'far');
+        computerSpans[computerResult].className = computerSpans[computerResult].className.replace('fas', 'far');
+        userChoice.removeEventListener('click', bindEvent);
+        Array.from(userAnchors).forEach(c => {
+            c.style.cursor = 'default';
+        });
+        resultNote.innerHTML = compareChoice(userResult, computerResult).toUpperCase();
+        restart.className = 'far fa-play-circle'; 
+        resultNote.appendChild(restart);  
+        restart.addEventListener('click', resetGame);
+    }
+
+    // page load
+    document.addEventListener('DOMContentLoaded', () => {
+         // 0 rock, 1 paper, 2 scissors
+         userChoice.addEventListener('click', bindEvent);
+    });
+
+})(window, document);
+</script>
+</body>
+</html>
