@@ -1,6 +1,6 @@
 # javascript.game
 
-## Live Demo
+## Demo
 
 <http://kate.pe.kr/project/game/game01.html>
 
